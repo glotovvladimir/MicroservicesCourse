@@ -3,6 +3,7 @@ package com.griddynamics.product.service;
 import com.griddynamics.product.model.Product;
 import com.griddynamics.product.model.ProductStatus;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import io.restassured.http.ContentType;
 import io.restassured.internal.RestAssuredResponseImpl;
 import io.restassured.response.ResponseBodyExtractionOptions;
@@ -47,7 +48,15 @@ public class ProductService {
         return instances.get(rand.nextInt(instances.size())).getUri().toString();
     }
 
-    @HystrixCommand(fallbackMethod = "fallbackForGetProductByIdIfAvailable")
+    @HystrixCommand(fallbackMethod = "fallbackForGetProductByIdIfAvailable",
+            commandProperties = {
+                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000"),
+                    @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "2"),
+                    @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "4000"),
+            },
+            threadPoolProperties = {
+                    @HystrixProperty(name = "coreSize", value = "30"),
+            })
     public Product getProductByIdIfAvailable(String id) {
         String result = getAvailabilityById(id);
         

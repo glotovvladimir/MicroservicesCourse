@@ -11,10 +11,8 @@
         <version>2.6.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.example</groupId>
-    <artifactId>service-registration-and-discovery-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>service-registration-and-discovery-service</name>
+    
+    <artifactId>eureka-server</artifactId>
 
     <properties>
         <java.version>8</java.version>

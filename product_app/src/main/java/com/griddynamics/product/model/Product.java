@@ -1,10 +1,10 @@
 package com.griddynamics.product.model;
 
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
+@Builder(toBuilder = true)
 public class Product {
     
     private String uniq_id;
