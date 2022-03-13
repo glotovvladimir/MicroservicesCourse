@@ -2,6 +2,7 @@ package com.griddynamics.product.service;
 
 import com.griddynamics.product.model.Product;
 import com.griddynamics.product.model.ProductStatus;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import io.restassured.http.ContentType;
 import io.restassured.internal.RestAssuredResponseImpl;
 import io.restassured.response.ResponseBodyExtractionOptions;
@@ -9,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,7 +19,7 @@ import java.util.Random;
 
 import static io.restassured.RestAssured.given;
 
-@Component
+@Service
 public class ProductService {
 
     @Value("${catalog.app.info.path}")
@@ -46,15 +47,17 @@ public class ProductService {
         return instances.get(rand.nextInt(instances.size())).getUri().toString();
     }
 
-//    @HystrixCommand(fallbackMethod = "fallbackForGetProductByIdIfAvailable")
+    @HystrixCommand(fallbackMethod = "fallbackForGetProductByIdIfAvailable")
     public Product getProductByIdIfAvailable(String id) {
         String result = getAvailabilityById(id);
         
         return result == null || result.equals("0.0") ? null : getProductInfoFromCatalogById(id);
     }
     
-    private Product fallbackForGetProductByIdIfAvailable() {
-        return new Product();
+    private Product fallbackForGetProductByIdIfAvailable(String id) {
+        return Product.builder()
+                .uniq_id(id)
+                .build();
     }
     
     public List<Product> getProductsBySkuIfAvailable(String sku) {
