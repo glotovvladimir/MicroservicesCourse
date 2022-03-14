@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -50,7 +52,7 @@ public class ProductService {
 
     @HystrixCommand(fallbackMethod = "fallbackForGetProductByIdIfAvailable",
             commandProperties = {
-                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000"),
+                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "4000"),
                     @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "2"),
                     @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "4000"),
             },
@@ -62,13 +64,20 @@ public class ProductService {
         
         return result == null || result.equals("0.0") ? null : getProductInfoFromCatalogById(id);
     }
-    
+
     private Product fallbackForGetProductByIdIfAvailable(String id) {
-        return Product.builder()
-                .uniq_id(id)
-                .build();
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
     }
     
+    @HystrixCommand(fallbackMethod = "fallbackForGetProductsBySkuIfAvailable",
+            commandProperties = {
+                    @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "4000"),
+                    @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "2"),
+                    @HystrixProperty(name = "circuitBreaker.sleepWindowInMilliseconds", value = "4000"),
+            },
+            threadPoolProperties = {
+                    @HystrixProperty(name = "coreSize", value = "30"),
+            })
     public List<Product> getProductsBySkuIfAvailable(String sku) {
         ArrayList<Product> result = new ArrayList<>(getProductsInfoFromCatalogBySku(sku));
         Iterator iterator = result.iterator();
@@ -81,6 +90,10 @@ public class ProductService {
                 iterator.remove();
         }
         return result;
+    }
+
+    private List<Product> fallbackForGetProductsBySkuIfAvailable(String sku) {
+        throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE);
     }
     
     public String getAvailabilityById(String id) {
