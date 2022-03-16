@@ -15,10 +15,11 @@ public class ProductController {
     
     private ProductService productService;
 
-    public ProductController(@Autowired ProductService productService) {
+    @Autowired
+    public ProductController(ProductService productService) {
         this.productService = productService;
     }
-
+    
     @RequestMapping(path = "/product/id/{id}", method = RequestMethod.GET)
     public Product getProductByIdIfAvailable(@PathVariable("id") String id) {
         return productService.getProductByIdIfAvailable(id);

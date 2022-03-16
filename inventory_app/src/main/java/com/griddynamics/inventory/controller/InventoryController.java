@@ -12,8 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class InventoryController {
 
     private InventoryService inventoryService;
-    
-    public InventoryController(@Autowired InventoryService inventoryService) {
+
+    @Autowired
+    public InventoryController(InventoryService inventoryService) {
         this.inventoryService = inventoryService;
     }
 
