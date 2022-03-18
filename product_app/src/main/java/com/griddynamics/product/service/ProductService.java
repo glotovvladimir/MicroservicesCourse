@@ -6,6 +6,8 @@ import com.griddynamics.product.model.Product;
 import com.griddynamics.product.model.ProductStatus;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -37,6 +39,8 @@ public class ProductService {
     private CatalogClient catalogClient;
     
     private InventoryClient inventoryClient;
+
+    private static final Logger log =  LoggerFactory.getLogger(ProductService.class);
 
     public ProductService(@Autowired CatalogClient catalogClient, 
                           @Autowired InventoryClient inventoryClient) {
@@ -91,15 +95,18 @@ public class ProductService {
     }
     
     public String getAvailabilityById(String id) {
+        log.info("Getting availability for product id: " + id);
         ProductStatus ps = inventoryClient.getAvailabilityById(id);
         return null != ps ? ps.getStatus() : null;
     }
     
     public Product getProductInfoFromCatalogById(String id) {
+        log.info("Getting catalog info for product id: " + id);
         return catalogClient.getProductInfoFromCatalogById(id);
     }
 
     public List<Product> getProductsInfoFromCatalogBySku(String sku) {
+        log.info("Getting availability for products by sku: " + sku);
         return catalogClient.getProductsInfoFromCatalogBySku(sku);
     }
 }
