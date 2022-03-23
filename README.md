@@ -11,7 +11,8 @@ Project consists of 4 modules:
 - Product app
 
 Zipkin server starts on http://localhost:9411 \
-Eureka server starts on http://localhost:8761
+Eureka server starts on http://localhost:8761 \
+Netflix Hystrix used for fallback behaviour
 
 ### Eureka server
 Registers other services to perform inter service calls using application name
@@ -19,17 +20,17 @@ Registers other services to perform inter service calls using application name
 ### Catalog app
 Holds product info in H2 database \
 Used to retrieve info by product id as one item or product sku as product list \
-Uses Zipkin server to post info for request performed
+Uses Sleuth + Zipkin server to post info for requests performed
 
 ### Inventory app
 Holds product availability info in H2 database \
 Used to retrieve availability info by product id \
-Uses Zipkin server to post info for request performed
+Uses Sleuth + Zipkin server to post info for requests performed
 
 ### Product app
 Performs product info requests and returns it based on its availability \
 Used to retrieve info by product id as one item or product sku as product list \
-Uses Zipkin server to post info for request performed
+Uses Sleuth + Zipkin server to post info for requests performed
 
 ## How to start project:
 1. Run ```docker run -d -p 9411:9411 openzipkin/zipkin``` to start Zipkin server
