@@ -1,6 +1,6 @@
 # Microservices project
 
-## Prerequisites:
+## Prerequisites
 - Docker client running
 
 ## Project information
