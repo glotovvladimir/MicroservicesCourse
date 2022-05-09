@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
@@ -29,15 +28,13 @@ public class RestClients {
 
     @Autowired
     private DiscoveryClient discoveryClient;
-
-    @Bean
-    CatalogClient getCatalogClient() {
-        return createClient(CatalogClient.class, getServiceUrl(catalogAppName));
+    
+    public CatalogClient getCatalogClient() {
+        return getClient(CatalogClient.class, getServiceUrl(catalogAppName));
     }
-
-    @Bean
-    InventoryClient getInventoryClient() {
-        return createClient(InventoryClient.class, getServiceUrl(inventoryAppName));
+    
+    public InventoryClient getInventoryClient() {
+        return getClient(InventoryClient.class, getServiceUrl(inventoryAppName));
     }
 
     private String getServiceUrl(String name) {
@@ -47,7 +44,7 @@ public class RestClients {
         return instances.get(rand.nextInt(instances.size())).getUri().toString();
     }
 
-    private static <T> T createClient(Class<T> type, String uri) {
+    private static <T> T getClient(Class<T> type, String uri) {
         return Feign.builder()
                 .client(new OkHttpClient())
                 .encoder(new GsonEncoder())
